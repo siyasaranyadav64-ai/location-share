@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Location</title>
+</head>
+
+<body>
+  <h2>Share your location</h2>
+  <p>
+    Tap the button below to share your current location.
+    Your browser will ask for permission first.
+  </p>
+
+  <button id="share">Share Location</button>
+  <p id="status"></p>
+
+  <script>
+    document.getElementById("share").onclick = () => {
+
+      if (!navigator.geolocation) {
+        document.getElementById("status").textContent =
+          "Location is not supported by this browser.";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+
+          const location = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: new Date().toISOString()
+          };
+
+          document.getElementById("status").textContent =
+            "Location shared successfully.";
+
+          // Send only after the user has granted permission.
+          await fetch("https://YOUR-SERVER-URL.example/location", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(location)
+          });
+        },
+
+        () => {
+          document.getElementById("status").textContent =
+            "Location permission was denied.";
+        }
+      );
+    };
+  </script>
+</body>
+</html>
